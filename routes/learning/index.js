@@ -1,7 +1,7 @@
 const express = require('express');
-const learningRouter = require('./learning')
+const sentences = require('./sentences.js')
 const router = express.Router();
 
-router.use('/learning',learningRouter)
+router.use('/sentences',sentences)
 
 module.exports = router
