@@ -1,4 +1,4 @@
-const Sentence = require('../schemas/sentences.js')
+const Sentence = require('../models/sentences.js')
 
 exports.getSentences = async(req,res)=>{
     try{
