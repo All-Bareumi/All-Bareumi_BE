@@ -22,6 +22,11 @@ const userSchema = new Schema({
         type:String,
         required: false,
         unique: false
+    },
+    profile_image_data:{
+        type:String,
+        required: false,
+        unique: false
     }
 
 
