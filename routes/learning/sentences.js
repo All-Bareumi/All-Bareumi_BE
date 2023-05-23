@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const {getSentences,getTypeEnum} = require('../../controllers/sentences.js')
+const {getSentences,getTypeEnum,putSentences} = require('../../controllers/sentences.js')
+const {authChecker} = require('../../middlewares');
 
-router.get('/list/:category?',getSentences)
+router.get('/list/:category?',authChecker,getSentences)
 
-router.get('/schema/:schema',getTypeEnum)
+router.get('/category',authChecker,getTypeEnum)
+
+router.put('/insert',putSentences)
 
 module.exports = router;
