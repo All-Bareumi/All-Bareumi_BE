@@ -81,3 +81,28 @@ exports.logout_user = (req,res)=>{
 exports.logout_kakao = (req, res) => {
   res.redirect('/')
 };
+
+exports.user_info = async(req,res)=>{
+  try{
+  let user = await User.findOne({
+    kakao_id : req.body.request_id
+  });
+  if(user){
+    console.log(user);
+    res.status(200).json({
+      profile:{
+        nickname : user.nickname,
+        profileImageUrl : user.profile_image_data
+      },
+      userId : user.kakao_id
+    })
+  }else{
+    res.status(500).json({
+      error : 'There is no User for your token'
+    }).redirect('/auth/login')
+  }
+  }catch(err){
+    console.log(err);
+    res.status(500).json({error : err})
+  }
+}
