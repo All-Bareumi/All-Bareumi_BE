@@ -27,8 +27,13 @@ const userSchema = new Schema({
         type:String,
         required: false,
         unique: false
+    },
+    category_enum:{
+        type : Array,
+        required: true,
+        unique:false,
+        default:['food','excersize','family','school']
     }
-
 
 })
 
