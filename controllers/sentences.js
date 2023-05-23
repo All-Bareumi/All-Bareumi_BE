@@ -30,19 +30,32 @@ exports.getTypeEnum = async(req,res)=>{
     }
 }
 
-exports.putSentences = (req,res)=>{
+exports.putSentences = async (req,res)=>{
     try{
-        const data = new Sentence(req.body);
-        data.save(function(err){
-            if(err){
-                console.log(err);
-                res.json({success:0,message:'Insert Failed'});
-            }else res.json({success:1,message:'Insert Success'})
-        }) 
-        
+        //Schema - EnumValues를 쓰지 않는 이유 : User마다 Sentence Category의 EnumValues가 다르고, 이를 정적인 Schema에 적용할 수 없기 때문이다.
+        let user = await User.findOne({kakao_id:req.body.request_id});
+        if(user){
+            let data = req.body;
+            delete data.request_id;
+            data.userId = user.id;
+            if(user.category_enum.includes(data.category)){
+                Sentence.collection.insertOne(data,function(err){
+                   if(err){
+                    console.log(err);
+                    res.status(500).json({success:0,message:'Duplicate Key'});
+                   }else{
+                    res.status(200).json({success:1,message:'Insert Successful'})
+                   }
+                })
+            }else{
+                res.status(500).json({message : `User does not have category : ${data.category}. Please add ${data.category} category to this User`})
+            }
+        }else{
+            res.status(500).json({message : 'There is no user for your Token'})
+        }
     }catch(error){
         console.log(error);
-        res.status(500).json({message:'Server Error'})
+        res.status(500).json({error: error, message:'DB Side Error'})
     }
 }
 

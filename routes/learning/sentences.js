@@ -7,6 +7,7 @@ router.get('/list/:category?',authChecker,getSentences)
 
 router.get('/category',authChecker,getTypeEnum)
 
-router.put('/insert',putSentences)
+router.put('/insert',authChecker,putSentences)
+
 
 module.exports = router;
