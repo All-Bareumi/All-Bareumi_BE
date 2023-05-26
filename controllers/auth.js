@@ -5,8 +5,39 @@ const User = require('../models/user.js');
 let jwt = require('jsonwebtoken');
 const user = require('../models/user.js');
 
-exports.login_user = (req,res)=>{
-  res.redirect(`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.KAKAO_ID}&redirect_uri=http://localhost:8001/api/auth/login/callback&response_type=code`);
+exports.login_user = (req,res)=>{ 
+  axios.get("https://kapi.kakao.com/v2/user/me",{headers : {
+        Authorization : `Bearer ${req.body.token}`
+      }}).then((info_res)=>{
+        User.findOne({
+          kakao_id: info_res.data.id
+        }, function (err, user) {
+          if (err) {
+            return res.json({ success: false, msg: err })
+          }
+          if (!user) {
+            user = new User({
+              nickname: info_res.data.properties.nickname,
+              kakao_id: info_res.data.id,
+              gender: info_res.data.kakao_account.gender,
+              photo_data: null,
+              profile_image_data: info_res.data.properties.profile_image
+            });
+            user.save(function (err) {
+              if (err) {
+                return res.json({ success: false, msg: err.message });
+              }
+              else {
+                let token = jwt.sign(user.kakao_id, secret);
+                res.json({ success: true, token: token });
+              }
+            });
+          } else {
+            let token = jwt.sign(user.kakao_id,secret);
+            res.json({ success: true, token: token });
+          }
+        })
+      });
 }
 
 exports.login_kakao = (req, res, next) => {
@@ -94,7 +125,8 @@ exports.user_info = async(req,res)=>{
         nickname : user.nickname,
         profileImageUrl : user.profile_image_data
       },
-      userId : user.kakao_id
+      userId : user.kakao_id,
+      gender : user.gender
     })
   }else{
     res.status(500).json({
