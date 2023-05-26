@@ -139,3 +139,8 @@ exports.user_info = async(req,res)=>{
     res.status(500).json({error : err})
   }
 }
+
+exports.user_photo = (req,res)=>{
+  console.log(req.file);
+  res.json({success:true,file:req.file});
+}
