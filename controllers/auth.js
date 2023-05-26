@@ -5,9 +5,10 @@ const User = require('../models/user.js');
 let jwt = require('jsonwebtoken');
 const user = require('../models/user.js');
 
-exports.login_user = (req,res)=>{ 
+exports.login_user = (req,res)=>{
+  const token = req.headers.authorization.split('Bearer ')[1];
   axios.get("https://kapi.kakao.com/v2/user/me",{headers : {
-        Authorization : `Bearer ${req.body.token}`
+        Authorization : `Bearer ${token}`
       }}).then((info_res)=>{
         User.findOne({
           kakao_id: info_res.data.id
