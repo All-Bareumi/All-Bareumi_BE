@@ -37,6 +37,7 @@ exports.putSentences = async (req,res)=>{
         if(user){
             let data = req.body;
             delete data.request_id;
+            data.type = 'user';
             data.userId = user.id;
             if(user.category_enum.includes(data.category)){
                 Sentence.collection.insertOne(data,function(err){
