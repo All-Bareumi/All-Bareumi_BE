@@ -16,6 +16,10 @@ exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId�
         else {
             sentences = await Sentence.find({},{_id:0});
         }
+        for(sentence of sentences){
+            let filename =sentence.videoPath.split('video/sentence/'+category+'/')[1];
+            sentence.videoPath = 'video/sentence/'+category+'/'+req.body.selectedCharacter+'/'+filename
+        }
         res.status(200).json({sentences:sentences,category : category,subjectKOR: '음식',subjectImg:'image/icon/icon_'+category+'.png'})
     } catch (error) {
         console.error(error);
