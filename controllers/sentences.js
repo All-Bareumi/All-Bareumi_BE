@@ -37,6 +37,25 @@ exports.getTypeEnum = async (req, res) => {
     }
 }
 
+exports.postCategory = async(req,res)=>{
+    try{
+        const user = await User.findOne({ 'kakao_id': req.body.request_id });
+        categories = user.category_enum
+        if(categories.includes(req.body.category) )
+        {
+            res.json({success:false,message:`There is already ${req.body.category}  category in User`})
+        }
+        else{
+        categories.push(req.body.category)
+        await User.updateOne({ 'kakao_id': req.body.request_id },{'category_enum':categories});
+        res.json({success:true});
+        }
+    }catch(error){
+        console.error(error);
+        res.status(500).json({message:'Put category - Server Error'})
+    }
+}
+
 exports.putSentences = async (req, res) => {
     try {
         //Schema - EnumValues를 쓰지 않는 이유 : User마다 Sentence Category의 EnumValues가 다르고, 이를 정적인 Schema에 적용할 수 없기 때문이다.
