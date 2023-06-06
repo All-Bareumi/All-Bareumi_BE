@@ -45,6 +45,11 @@ exports.putSentences = async (req, res) => {
             let data = req.body;
             data.sentence.type = 'user';
             data.sentence.userId = user._id;
+            if(data.character=='anna'||'elsa'){
+                data.gender = 'female';
+            }else if(data.character=='hans'||'kristoff'){
+                data.gender='male'
+            }
             if (user.category_enum.includes(data.sentence.category)) {
                 cate_sentences = await Sentence.find({
                     "category": data.sentence.category, $or: [
