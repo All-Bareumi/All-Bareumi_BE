@@ -82,7 +82,7 @@ exports.putSentences = async (req, res) => {
                         console.log(err);
                         res.status(500).json({ success: 0, message: 'Duplicate Key' });
                     } else {
-                        await axios.post('http://localhost:8080/sentence/insert', {
+                        await axios.post('http://127.0.0.1:8080/sentence/insert', {
                             gender: data.gender,
                             character: data.character+".png",
                             input_text: data.sentence.content,
@@ -94,7 +94,7 @@ exports.putSentences = async (req, res) => {
                             characters = ['anna', 'elsa', 'kristoff', 'hans'];
                             for (character of characters) {
                                 if (data.character != character) {
-                                    axios.post('http://localhost:8080/sentence/insert', {
+                                    axios.post('http://127.0.0.1:8080/sentence/insert', {
                                         gender: data.gender,
                                         character: character + ".png",
                                         input_text: data.sentence.content,
