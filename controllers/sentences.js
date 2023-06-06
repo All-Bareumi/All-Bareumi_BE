@@ -16,7 +16,7 @@ exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId�
         else {
             sentences = await Sentence.find({},{_id:0});
         }
-        res.status(200).json({sentences:sentences})
+        res.status(200).json({sentences:sentences,category : category,subjectKOR: '음식',subjectImg:'Image/icon/icon_'+category})
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' })
