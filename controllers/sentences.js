@@ -14,7 +14,7 @@ exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId�
             sentences = await Sentence.find({ 'category': category }).or([{ type: 'default' }, { userId: user.id }]);
         }
         else {
-            sentences = await Sentence.find({});
+            sentences = await Sentence.find({},{_id:0});
         }
         res.status(200).json({sentences:sentences})
     } catch (error) {
