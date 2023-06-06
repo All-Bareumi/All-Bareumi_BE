@@ -88,13 +88,13 @@ exports.putSentences = async (req, res) => {
                             input_text: data.sentence.content,
                             out_path: "video/sentence/"+data.sentence.category+"/"+data.character+"/",
                             filename: data.sentence.category+cate_sentences.length
-                        }).then(result => {
+                        }).then(async result => {
                             console.log(result.data);
                             res.status(200).json({ success: result.data.success,path: result.data.path, message: 'Insert Successful' })
                             characters = ['anna', 'elsa', 'kristoff', 'hans'];
                             for (character of characters) {
                                 if (data.character != character) {
-                                    axios.post('http://127.0.0.1:8080/sentence/insert', {
+                                    await axios.post('http://127.0.0.1:8080/sentence/insert', {
                                         gender: data.gender,
                                         character: character + ".png",
                                         input_text: data.sentence.content,
