@@ -11,7 +11,7 @@ exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId�
         let sentences = {}
         if (category) {
             let user = await User.findOne({ 'kakao_id': req.body.request_id });
-            sentences = await Sentence.find({ 'category': category }).or([{ type: 'default' }, { userId: user.id }]);
+            sentences = await Sentence.find({ 'category': category },{_id:0}).or([{ type: 'default' }, { userId: user.id }]);
         }
         else {
             sentences = await Sentence.find({},{_id:0});
