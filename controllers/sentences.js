@@ -76,6 +76,7 @@ exports.putSentences = async (req, res) => {
                         { type: "default" }
                     ]
                 })
+                data.sentence.videoPath = 'video/sentence/'+data.sentence.category+'/'+data.sentence.category+cate_sentences.length+'.mp4'
                 Sentence.collection.insertOne(data.sentence, async function (err) {
                     if (err) {
                         console.log(err);
