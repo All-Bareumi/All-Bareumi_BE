@@ -5,13 +5,32 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose;
 const ObjectId = Schema.ObjectId
 const axios = require('axios');
+const path = require('path')
 exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId도 전달해서 나중에 학습 완료 시에 해당 Id 값 제출하게끔 함.
     try {
         const category = req.params.category
+        let categoryKOR = ""
+        switch(category){
+            case "food":
+                categoryKOR="음식"
+                break;
+            case "school":
+                categoryKOR="학교"
+                break;
+            case "family":
+                categoryKOR="가족"
+                break;
+            case "exercise":
+                categoryKOR="운동"
+                break;
+            default:
+                categoryKOR = category
+                break;
+        }
         let sentences = {}
         if (category) {
             let user = await User.findOne({ 'kakao_id': req.body.request_id });
-            sentences = await Sentence.find({ 'category': category },{_id:0}).or([{ type: 'default' }, { userId: user.id }]);
+            sentences = await Sentence.find({ 'category': category }).or([{ type: 'default' }, { userId: user.id }]);
         }
         else {
             sentences = await Sentence.find({},{_id:0});
@@ -20,7 +39,7 @@ exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId�
             let filename =sentence.videoPath.split('video/sentence/'+category+'/')[1];
             sentence.videoPath = 'video/sentence/'+category+'/'+req.params.selectedCharacter+'/'+filename
         }
-        res.status(200).json({sentences:sentences,category : category,subjectKOR: '음식',subjectImg:'image/icon/icon_'+category+'.png'})
+        res.status(200).json({sentences:sentences,category : category,subjectKOR: categoryKOR,subjectImg:'image/icon/icon_'+category+'.png'})
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' })
@@ -55,6 +74,61 @@ exports.postCategory = async(req,res)=>{
         res.status(500).json({message:'Put category - Server Error'})
     }
 }
+exports.pronounceEval = async(req,res)=>{
+    try{
+    abs_path = path.resolve(req.file.path)
+    axios.post('http://localhost:8080//pronounce/evaluation',{
+        filename: abs_path,
+        sentence : req.body.sentence
+    }).then(async result=>{
+        const user = await User.findOne({'kakao_id':req.body.request_id});
+        let log = {
+            sentence_id : req.body.sentence_id,
+            score : result.data
+        }
+        if(user.study_log.recent_date){
+            let user_recent_date = user.study_log.recent_date
+            let now = new Date()
+            if(user_recent_date.toDateString()!=now.toDateString()){
+                let time_diff = new Date(now.setHours(0,0,0,0)) - new Date(user_recent_date.setHours(0,0,0,0))
+                if(time_diff>=24*60*60*1000){
+                    if(time_diff>=48*60*60*1000){
+                        user.study_log.study_continuity_cnt=0;
+                    }else{
+                        user.study_log.study_continuity_cnt +=1;
+                    }
+                    user.study_log.recent_date = new Date();
+                    user.study_log.date_logs.push({
+                        date : new Date(new Date().setHours(0,0,0,0)),
+                        logs : [log]
+                    })
+                }  
+            }else{
+                let today = new Date(new Date().setHours(0,0,0,0));
+                user.study_log.date_logs.find(datelog=>datelog.date.getTime() == today.getTime()).logs.push(log); 
+            }   
+        }else{
+            user.study_log.recent_date = new Date();
+            user.study_log.date_logs.push({
+                date : new Date(new Date().setHours(0,0,0,0)),
+                logs : [log]
+            })
+        }
+        let goal_achived = user.goal_amount==user.study_log.date_logs.find(datelog=>datelog.date.getTime() == new Date(new Date().setHours(0,0,0,0)).getTime()).logs.length
+        user.save(function(err){
+            if(err){
+                res.json({success:false,error:err})
+            }else{
+                res.json({success:true,score:result.data,is_goal_achived: goal_achived})
+            }
+        })
+        
+    })
+    }catch(err){
+        console.log(err);
+        res.json({success:false,error:err})
+    }
+}
 
 exports.putSentences = async (req, res) => {
     try {
@@ -68,6 +142,8 @@ exports.putSentences = async (req, res) => {
                 data.gender = 'female';
             }else if(data.character=='hans'||'kristoff'){
                 data.gender='male'
+            }else{
+                data.gender = user.gender
             }
             if (user.category_enum.includes(data.sentence.category)) {
                 cate_sentences = await Sentence.find({
