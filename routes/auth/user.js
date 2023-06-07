@@ -1,6 +1,15 @@
 const express = require('express');
 const multer  = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, '../All-Bareumi_AI/Wav2Lip/my_data')
+    },
+    filename: (req, file, cb) => {
+        let newFileName = "myAvatar.png";
+        cb(null, newFileName)
+    },
+})
+const upload = multer({storage:storage});
 
 const { user_info, user_photo } = require('../../controllers/auth.js');
 const {authChecker} = require('../../middlewares');
