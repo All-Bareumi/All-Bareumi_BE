@@ -6,6 +6,7 @@ const { Schema } = mongoose;
 const ObjectId = Schema.ObjectId
 const axios = require('axios');
 const path = require('path')
+const default_category = ["food","school","family","exercise"]
 exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId도 전달해서 나중에 학습 완료 시에 해당 Id 값 제출하게끔 함.
     try {
         const category = req.params.category
@@ -39,7 +40,10 @@ exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId�
             let filename = sentence.videoPath.split('video/sentence/' + category + '/')[1];
             sentence.videoPath = 'video/sentence/' + category + '/' + req.params.selectedCharacter + '/' + filename
         }
-        res.status(200).json({ sentences: sentences, category: category, subjectKOR: categoryKOR, subjectImg: 'image/icon/icon_' + category + '.png' })
+        let subjectImg = ''
+        if(default_category.includes(category))subjectImg = 'image/icon/icon_' + category + '.png'
+        else subjectImg = 'image/logo/logo.png'
+        res.status(200).json({ sentences: sentences, category: category, subjectKOR: categoryKOR, subjectImg:subjectImg  })
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' })
