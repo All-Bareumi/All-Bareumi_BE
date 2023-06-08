@@ -144,3 +144,20 @@ exports.user_photo = (req,res,next)=>{
   console.log(req.file);
   next();
 }
+
+
+exports.set_user_goal = async(req,res)=>{
+  let user = await User.findOne({kakao_id:req.body.request_id})
+  if(req.body.goal<1){
+    res.json({success:false,message:'0보다 큰 수로 정해주세요'})
+  }else{
+    user.goal_amount = req.body.goal
+    user.save(function(err){
+      if(err){
+        res.json({success:false,error:err})
+      }else{
+        res.json({success:true})
+      }
+    })
+  }
+}
