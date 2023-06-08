@@ -176,7 +176,7 @@ exports.allReport = async(req,res)=>{
   let result = logs.sort((a,b)=>b.date-a.date);
   let response = []
   for(log of result){
-    response.push(log.date+9*60*60*1000)
+    response.push(new Date(log.date+9*60*60*1000))
   }
   res.json({dates : response});
 }
