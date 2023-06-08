@@ -184,7 +184,7 @@ exports.allReport = async(req,res)=>{
 exports.modifyReward = async(req,res)=>{
   let user = await User.findOne({kakao_id:req.body.request_id});
   let rewards = user.user_rewards;
-  let reward_index = rewards.find(reward=>reward.id==req.body.id)
+  let reward_index = rewards.findIndex(reward=>reward.id==req.body.id)
   let reward = rewards[reward_index]
   reward.count = req.body.count
   reward.goal_type = req.body.goal_type
