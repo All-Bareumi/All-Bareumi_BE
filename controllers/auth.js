@@ -197,6 +197,18 @@ exports.modifyReward = async(req,res)=>{
     }else res.json({success:true})
   })
 }
+exports.deleteReward = async(req,res)=>{
+  let user = await User.findOne({kakao_id:req.body.request_id});
+  let rewards = user.user_rewards;
+  let reward_index = rewards.findIndex(reward=>reward.id==req.body.id)
+  rewards.pop(reward_index);
+  user.user_rewards = rewards;
+  user.save(function(err){
+    if(err){
+      res.json({success:false,error:err})
+    }else res.json({success:true})
+  })
+}
 
 
 

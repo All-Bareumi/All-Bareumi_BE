@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({storage:storage});
 const {create_user_character} = require('../../controllers/sentences.js')
-const { user_info, user_photo, set_user_goal,dayReport, isGoalAchived, rewardList, nearestReward, postReward,achivedReward, allReport, modifyReward} = require('../../controllers/auth.js');
+const { user_info, user_photo, set_user_goal,dayReport, isGoalAchived, rewardList, nearestReward, postReward,achivedReward, allReport, modifyReward, deleteReward} = require('../../controllers/auth.js');
 const {authChecker} = require('../../middlewares');
 const router = express.Router();
 
@@ -32,6 +32,8 @@ router.post('/reward/modify',authChecker,modifyReward)
 router.get('/today/goal/achived',authChecker,isGoalAchived)
 
 router.get('/reward/list',authChecker,rewardList)
+
+router.post('/reward/delete',authChecker,deleteReward)
 
 router.get('/reward/nearest',authChecker,nearestReward)
 
