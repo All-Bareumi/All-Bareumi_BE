@@ -234,14 +234,14 @@ exports.putSentencesFromPhoto = (req, res) => {
                         type: 'user',
                         category: req.body.category,
                         content: sentence,
-                        videoPath : 'video/sentence/' + req.body.category + '/' + req.body.category + cate_sentences.length + '.mp4'
-
+                        videoPath : 'video/sentence/' + req.body.category + '/' + req.body.category + cate_sentences.length + '.mp4',
+                        userId : user._id    
                     }, function (err) {
                         if(err){
                             res.json({success:false, error: err})
                         }
                     })
-                })
+                }) 
             }
         }
         res.json({success:true});
