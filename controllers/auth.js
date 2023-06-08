@@ -214,13 +214,13 @@ exports.nearestReward = async (req, res) => {
   let nearest_sentence_amount = 0 
   let nearest_day = ''
   let nearest_sentence=''
-  if (day_reward) {
+  if (day_reward.length>0) {
     nearest_day = day_reward.reduce((prev, value) => {
           return (prev.count - prev.achivement) <= (value.count - value.achivement) ? prev : value
         })
         nearest_day_amount = nearest_day.count - nearest_day.achivement 
   }
-  if (sentence_reward) {
+  if (sentence_reward.length>0) {
     nearest_sentence = sentence_reward.reduce((prev, value) => {
       return (prev.count - prev.achivement) <= (value.count - value.achivement) ? prev : value
     })
@@ -236,7 +236,7 @@ exports.nearestReward = async (req, res) => {
     res.json({ message: `${nearest_sentence_amount}문장만 더 공부하면`, reward: nearest_sentence.reward })
   } else if (nearest_day_amount) {
     res.json({ message: `${nearest_day_amount}일만 더 공부하면`, reward: nearest_day.reward })
-  } else res.json({ message: '목표와 보상을 추가로 설정하세요!' })
+  } else res.json({ message: '목표와 보상을 추가로 설정하세요!',reward:'' })
 }
 
 exports.postReward = async (req, res) => {
