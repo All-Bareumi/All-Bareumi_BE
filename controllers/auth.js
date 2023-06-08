@@ -170,6 +170,30 @@ exports.set_user_goal = async (req, res) => {
   }
 }
 
+exports.allReport = async(req,res)=>{
+  let user = await User.findOne({kakao_id: req.body.request_id});
+  logs = user.study_log.date_logs;
+  let result = logs.sort((a,b)=>b.date-a.date);
+  res.json({logs : result});
+}
+
+exports.modifyReward = async(req,res)=>{
+  let user = await User.findOne({kakao_id:req.body.request_id});
+  let rewards = user.user_rewards;
+  let reward_index = rewards.find(reward=>reward.id==req.body.id)
+  let reward = rewards[reward_index]
+  reward.count = req.body.count
+  reward.goal_type = req.body.goal_type
+  reward.reward = req.body.reward
+  rewards[reward_index] = reward
+  user.user_rewards = rewards
+  user.save(function(err){
+    if(err){
+      res.json({success:false,error:err})
+    }else res.json({success:true})
+  })
+}
+
 
 
 exports.todayReport = async (req, res) => {
