@@ -176,7 +176,7 @@ exports.allReport = async(req,res)=>{
   let result = logs.sort((a,b)=>b.date-a.date);
   let response = []
   for(log of result){
-    response.push(log.date)
+    response.push(log.date+9*60*60*1000)
   }
   res.json({dates : response});
 }
@@ -217,7 +217,8 @@ exports.dayReport = async (req, res) => {
   let report = {
     avg_point: sum_point / logs.length,
     best_sentence: best_sentence.content,
-    worst_sentence: worst_sentence.content
+    worst_sentence: worst_sentence.content,
+    total_sentences: logs.length
   }
   res.json(report);
 }
