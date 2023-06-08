@@ -2,6 +2,7 @@ require('dotenv').config();
 const axios = require('axios');
 const secret = process.env.COOKIE_SECRET;
 const User = require('../models/user.js');
+const Sentence = require('../models/sentences.js')
 let jwt = require('jsonwebtoken');
 const user = require('../models/user.js');
 
@@ -162,4 +163,36 @@ exports.set_user_goal = async(req,res)=>{
     })
   }
 }
+
+
+
+exports.todayReport = async(req,res)=>{
+  let user = await User.findOne({kakao_id:req.body.request_id});
+  let today = new Date(new Date().setHours(0,0,0,0))
+  let logs = user.study_log.date_logs.find(datelog=>datelog.date.getTime() == today.getTime()).logs
+  let best_score_index =0
+  let worst_score_index = 0;
+  let sum_point=0;
+  for (log of logs){
+    sum_point += log.score
+    if(log.score>logs[best_score_index].score)best_score_index = logs.indexOf(log);
+    if(log.score<logs[worst_score_index].score)worst_score_index = logs.indexOf(log);      
+  }
+  let best_sentence = await Sentence.findById( logs[best_score_index].sentence_id);
+  let worst_sentence = await Sentence.findById( logs[worst_score_index].sentence_id);
+  let report = {
+    avg_point:sum_point/logs.length,
+    best_sentence : best_sentence.content,
+    worst_sentence:worst_sentence.content
+  }
+  res.json(report);
+}
+
+exports.isGoalAchived = async(req,res)=>{
+  let user = await User.findOne({kakao_id:req.body.request_id});
+  let today = new Date(new Date().setHours(0,0,0,0))
+  let today_cnt = user.study_log.date_logs.find(datelog=>datelog.date.getTime() == today.getTime()).logs.length
+  res.json({isAchived:user.goal_amount<=today_cnt});
+}
+
 
