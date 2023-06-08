@@ -202,7 +202,7 @@ exports.modifyReward = async(req,res)=>{
 
 exports.dayReport = async (req, res) => {
   let user = await User.findOne({ kakao_id: req.body.request_id });
-  let today = new Date(new Date(req.body.date).setHours(0,0,0,0))
+  let today = new Date(new Date(req.params.date).setHours(0,0,0,0))
   let logs = user.study_log.date_logs.find(datelog => datelog.date.getTime() == today.getTime()).logs
   let best_score_index = 0
   let worst_score_index = 0;

@@ -25,7 +25,7 @@ router.post('/photos/upload',upload.single('data'),authChecker,user_photo,create
 
 router.get('/report/list',authChecker,allReport)
 
-router.get('/day/report',authChecker,dayReport);
+router.get('/day/report/:date',authChecker,dayReport);
 
 router.post('/reward/modify',authChecker,modifyReward)
 
