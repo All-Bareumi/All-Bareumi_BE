@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
     },
 })
 const upload = multer({storage:storage});
-
+const {create_user_character} = require('../../controllers/sentences.js')
 const { user_info, user_photo } = require('../../controllers/auth.js');
 const {authChecker} = require('../../middlewares');
 const router = express.Router();
@@ -19,7 +19,7 @@ const router = express.Router();
 
 router.get('/me',authChecker,user_info);
 
-router.post('/photos/upload',upload.single('data'),user_photo);
+router.post('/photos/upload',upload.single('data'),authChecker,user_photo,create_user_character);
 
 
 module.exports = router;

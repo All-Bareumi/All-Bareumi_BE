@@ -77,7 +77,7 @@ exports.postCategory = async(req,res)=>{
 exports.pronounceEval = async(req,res)=>{
     try{
     abs_path = path.resolve(req.file.path)
-    axios.post('http://localhost:8080//pronounce/evaluation',{
+    axios.post('http://127.0.0.1:8080//pronounce/evaluation',{
         filename: abs_path,
         sentence : req.body.sentence
     }).then(async result=>{
@@ -192,5 +192,33 @@ exports.putSentences = async (req, res) => {
         console.log(error);
         res.status(500).json({ error: error, message: 'DB Side Error' })
     }
+}
+
+exports.create_user_character = async (req,res)=>{
+    let user = await User.findOne({kakao_id:req.body.request_id});
+    let user_category = user.category_enum;
+    for(category of user_category){
+        let category_sentences = await Sentence.find({ 'category': category }).or([{ type: 'default' }, { userId: user.id }]);
+        for(sentence of category_sentences){
+            await axios.post('http://127.0.0.1:8080/sentence/insert',{
+                gender: user.gender,
+                character: 'myAvatar.png',
+                input_text: sentence.content,
+                out_path:"video/sentence/"+category+"/myAvatar/",
+                filename: sentence.videoPath.split('/')[3].split('.')[0]
+            })
+        }
+    }
+    res.json({success:true,file: req.file})
+}
+
+exports.putSentencesFromPhoto= (req,res)=>{
+    let abs_path = path.resolve(req.file.path)
+    axios.post('http://127.0.0.1:8080/ocr',{
+        filename:abs_path
+    }).then(result=>{
+        console.log(result.data);
+        res.send(result.data)
+    })
 }
 

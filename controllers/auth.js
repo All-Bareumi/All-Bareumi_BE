@@ -140,7 +140,7 @@ exports.user_info = async(req,res)=>{
   }
 }
 
-exports.user_photo = (req,res)=>{
+exports.user_photo = (req,res,next)=>{
   console.log(req.file);
-  res.json({success:true,file:req.file});
+  next();
 }
