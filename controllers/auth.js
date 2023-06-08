@@ -127,7 +127,8 @@ exports.user_info = async(req,res)=>{
         profileImageUrl : user.profile_image_data
       },
       userId : user.kakao_id,
-      gender : user.gender
+      gender : user.gender,
+      goal_amount : user.goal_amount
     })
   }else{
     res.status(500).json({
@@ -161,3 +162,4 @@ exports.set_user_goal = async(req,res)=>{
     })
   }
 }
+
