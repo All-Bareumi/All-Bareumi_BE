@@ -28,13 +28,24 @@ var dateLogSchema = new Schema({
 })
 
 var rewardSchema = new Schema({
-    date_count:{
+    count:{
         type : Number,
         required : true
+    },
+    goal_type:{
+        type:String,
+        required : true,
+        enum : ['문장','일'],
+        default:'문장'        
     },
     reward : {
         type : String,
         required : true
+    },
+    achivement:{
+        type: Number,
+        required:true,
+        default:0
     }
 })
 
@@ -116,12 +127,13 @@ const userSchema = new Schema({
         type : [rewardSchema],
         required: true,
         default:[{
-            date_count:30,
-            reward: '맛있는 치킨 쿠폰'
+            count:30,
+            goal_type:'문장',
+            reward: '치킨'
         }]
     },
     achived_rewards:{
-        type:[String],
+        type:[rewardSchema],
         required:true,
         default:[]
     }

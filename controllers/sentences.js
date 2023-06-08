@@ -7,6 +7,7 @@ const ObjectId = Schema.ObjectId
 const axios = require('axios');
 const path = require('path')
 const default_category = ["food","school","family","exercise"]
+const default_character = ['anna','elsa','hans','kristoff']
 exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId도 전달해서 나중에 학습 완료 시에 해당 Id 값 제출하게끔 함.
     try {
         const category = req.params.category
@@ -34,7 +35,7 @@ exports.getSentences = async (req, res) => { //프론트에 전달 시 ObjectId�
             sentences = await Sentence.find({ 'category': category }).or([{ type: 'default' }, { userId: user.id }]);
         }
         else {
-            sentences = await Sentence.find({}, { _id: 0 });
+            sentences = await Sentence.find({});
         }
         for (sentence of sentences) {
             let filename = sentence.videoPath.split('video/sentence/' + category + '/')[1];
@@ -118,7 +119,27 @@ exports.pronounceEval = async (req, res) => {
                     logs: [log]
                 })
             }
-            let goal_achived = user.goal_amount == user.study_log.date_logs.find(datelog => datelog.date.getTime() == new Date(new Date().setHours(0, 0, 0, 0)).getTime()).logs.length
+            let goal_achived = user.goal_amount <= user.study_log.date_logs.find(datelog => datelog.date.getTime() == new Date(new Date().setHours(0, 0, 0, 0)).getTime()).logs.length
+            if(user.goal_amount == user.study_log.date_logs.find(datelog => datelog.date.getTime() == new Date(new Date().setHours(0, 0, 0, 0)).getTime()).logs.length){
+                let date_rewards = user.user_rewards.filter(reward=>reward.goal_type=='일')
+                for(reward of date_rewards){
+                    reward.achivement+=1
+                }
+            }
+            let sentence_rewards = user.user_rewards.filter(reward=>reward.goal_type=='문장');
+            for(reward of sentence_rewards){
+                reward.achivement +=1;
+            }
+            let all_rewards = user.user_rewards;
+            let achived_rewards = user.achived_rewards;
+            for(reward of all_rewards){
+                if(reward.count==reward.achivement){
+                    achived_rewards.push(reward)
+                    all_rewards.pop(reward);
+                }
+            }
+            user.user_rewards = all_rewards;
+            user.achived_rewards = achived_rewards;
             user.save(function (err) {
                 if (err) {
                     res.json({ success: false, error: err })
@@ -249,6 +270,37 @@ exports.putSentencesFromPhoto = (req, res) => {
             }
         }
         res.json({success:true});
+        for (sentence of sentences) {
+            if (sentence != '' && sentence != ' ') {
+                cate_sentences = await Sentence.find({
+                    "category": req.body.category, $or: [
+                        { userId: user._id },
+                        { type: "default" }
+                    ]
+                })
+                let characters = default_character;
+                if(user.hasAvatar) characters.push('myAvatar')
+                for(character of characters){
+                    if(character!=req.body.character){
+                        await axios.post('http://127.0.0.1:8080/sentence/insert',{
+                            gender: character_gender(character),
+                            character : character+'.png',
+                            input_text : sentence,
+                            out_path: "video/sentence/" + req.body.category + "/" + character + "/",
+                            filename: req.body.category + cate_sentences.length
+                        }).then(async result => {
+                            await Sentence.collection.insertOne({
+                                type: 'user',
+                                category: req.body.category,
+                                content: sentence,
+                                videoPath : 'video/sentence/' + req.body.category + '/' + req.body.category + cate_sentences.length + '.mp4',
+                                userId : user._id    
+                            })
+                        }) 
+                    }
+                }
+            }
+        }
     })
 }
 
