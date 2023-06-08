@@ -230,8 +230,9 @@ exports.putSentencesFromPhoto = (req, res) => {
                     out_path: "video/sentence/" + req.body.category + "/" + req.body.character + "/",
                     filename: req.body.category + cate_sentences.length
                 }).then(async result => {
-                    await Sentence.insertOne({
+                    await Sentence.collection.insertOne({
                         type: 'user',
+                        category: req.body.category,
                         content: sentence,
                         videoPath : 'video/sentence/' + req.body.category + '/' + req.body.category + cate_sentences.length + '.mp4'
 
