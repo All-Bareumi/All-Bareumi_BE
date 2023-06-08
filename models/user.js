@@ -71,6 +71,11 @@ const userSchema = new Schema({
         required : true,
         default : 10
     },
+    hasAvatar:{
+        type:Boolean,
+        required : true,
+        default : false
+    },
     study_log : {
         start_date : {
             type: Date,
