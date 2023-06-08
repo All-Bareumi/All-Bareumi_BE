@@ -27,6 +27,17 @@ var dateLogSchema = new Schema({
     }
 })
 
+var rewardSchema = new Schema({
+    date_count:{
+        type : Number,
+        required : true
+    },
+    reward : {
+        type : String,
+        required : true
+    }
+})
+
 const userSchema = new Schema({
     nickname:{
         type: String,
@@ -100,6 +111,19 @@ const userSchema = new Schema({
             required: true,
             default : []
         }
+    },
+    user_rewards:{
+        type : [rewardSchema],
+        required: true,
+        default:[{
+            date_count:30,
+            reward: '맛있는 치킨 쿠폰'
+        }]
+    },
+    achived_rewards:{
+        type:[String],
+        required:true,
+        default:[]
     }
 
 })
