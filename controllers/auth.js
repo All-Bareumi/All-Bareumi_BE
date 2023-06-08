@@ -174,7 +174,11 @@ exports.allReport = async(req,res)=>{
   let user = await User.findOne({kakao_id: req.body.request_id});
   logs = user.study_log.date_logs;
   let result = logs.sort((a,b)=>b.date-a.date);
-  res.json({logs : result});
+  let response = []
+  for(log of result){
+    response.push(log.date)
+  }
+  res.json({dates : response});
 }
 
 exports.modifyReward = async(req,res)=>{
@@ -196,9 +200,9 @@ exports.modifyReward = async(req,res)=>{
 
 
 
-exports.todayReport = async (req, res) => {
+exports.dayReport = async (req, res) => {
   let user = await User.findOne({ kakao_id: req.body.request_id });
-  let today = new Date(new Date().setHours(0, 0, 0, 0))
+  let today = new Date(new Date(req.body.date).setHours(0,0,0,0))
   let logs = user.study_log.date_logs.find(datelog => datelog.date.getTime() == today.getTime()).logs
   let best_score_index = 0
   let worst_score_index = 0;
