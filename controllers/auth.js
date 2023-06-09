@@ -189,6 +189,7 @@ exports.modifyReward = async(req,res)=>{
   reward.count = req.body.count
   reward.goal_type = req.body.goal_type
   reward.reward = req.body.reward
+  reward.achivement = 0;
   rewards[reward_index] = reward
   user.user_rewards = rewards
   user.save(function(err){
