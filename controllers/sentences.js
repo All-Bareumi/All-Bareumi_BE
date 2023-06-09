@@ -270,8 +270,8 @@ exports.putSentencesFromPhoto = (req, res) => {
             }
         }
         res.json({success:true});
-        for (sentence of sentences) {
-            if (sentence != '' && sentence != ' ') {
+        for (input_sentence of sentences) {
+            if (input_sentence != '' && input_sentence != ' ') {
                 cate_sentences = await Sentence.find({
                     "category": req.body.category, $or: [
                         { userId: user._id },
@@ -283,20 +283,12 @@ exports.putSentencesFromPhoto = (req, res) => {
                 for(character of characters){
                     if(character!=req.body.character){
                         await axios.post('http://127.0.0.1:8080/sentence/insert',{
-                            gender: character_gender(character),
+                            gender: character_gender(character,user),
                             character : character+'.png',
-                            input_text : sentence,
+                            input_text : input_sentence,
                             out_path: "video/sentence/" + req.body.category + "/" + character + "/",
                             filename: req.body.category + cate_sentences.length
-                        }).then(async result => {
-                            await Sentence.collection.insertOne({
-                                type: 'user',
-                                category: req.body.category,
-                                content: sentence,
-                                videoPath : 'video/sentence/' + req.body.category + '/' + req.body.category + cate_sentences.length + '.mp4',
-                                userId : user._id    
-                            })
-                        }) 
+                        })
                     }
                 }
             }
