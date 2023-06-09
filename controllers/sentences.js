@@ -240,8 +240,9 @@ exports.putSentencesFromPhoto = (req, res) => {
     }).then(async result => {
         let user = await User.findOne({kakao_id:req.body.request_id})
         let sentences = result.data.split(/[.|?|!|'|"|\n]/)
-        for (sentence of sentences) {
-            if (sentence != '' && sentence != ' ') {
+        for (sentence_content of sentences) {
+            console.log(sentence_content);
+            if (sentence_content != '' && sentence_content != ' ') {
                 cate_sentences = await Sentence.find({
                     "category": req.body.category, $or: [
                         { userId: user._id },
@@ -251,14 +252,14 @@ exports.putSentencesFromPhoto = (req, res) => {
                 await axios.post('http://127.0.0.1:8080/sentence/insert',{
                     gender: character_gender(req.body.character),
                     character : req.body.character+'.png',
-                    input_text : sentence,
+                    input_text : sentence_content,
                     out_path: "video/sentence/" + req.body.category + "/" + req.body.character + "/",
                     filename: req.body.category + cate_sentences.length
                 }).then(async post_result => {
                     await Sentence.collection.insertOne({
                         type: 'user',
                         category: req.body.category,
-                        content: sentence,
+                        content: sentence_content,
                         videoPath : 'video/sentence/' + req.body.category + '/' + req.body.category + cate_sentences.length + '.mp4',
                         userId : user._id    
                     }, function (err) {
